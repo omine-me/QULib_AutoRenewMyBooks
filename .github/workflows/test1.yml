@@ -21,13 +21,15 @@ jobs:
         id: myRequest
         uses: fjogeleit/http-request-action@master
         with:
-          url: "https://rakko.tools/tools/2/"
+          url: "http://httpbin.org/ip"
+          method: 'GET'
       - name: Show Response
         run: echo ${{ steps.myRequest.outputs.response }}
       - name: Make Request
         id: myRequest2
         uses: fjogeleit/http-request-action@master
         with:
-          url: "https://rakko.tools/tools/2/"
+          url: "http://httpbin.org/ip"
+          method: 'GET'
       - name: Show Response2
         run: echo ${{ steps.myRequest2.outputs.response }}
