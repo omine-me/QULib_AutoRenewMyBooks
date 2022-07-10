@@ -24,8 +24,8 @@ jobs:
           url: 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re'
       - name: Show Response
         run: |
-          echo ${{ fromJson(steps.re.outputs.headers)["Set-Cookie"] }}
-          echo "SSESS=${{ fromJson(steps.re.outputs.headers)[Set-Cookie] }}" >> $GITHUB_ENV
+          echo ${{ fromJson(steps.re.outputs.headers).Set-Cookie }}
+          echo "SSESS=${{ fromJson(steps.re.outputs.headers).Set-Cookie }}" >> $GITHUB_ENV
           : # 改行付き echo であることに注目
       - name: Step2
         run: |
