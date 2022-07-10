@@ -19,18 +19,8 @@ jobs:
     steps:
       - name: https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re
         id: re
-        uses: fjogeleit/http-request-action@master
+        uses: CamiloGarciaLaRotta/watermelon-http-client@v1
         with:
-#           url: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"
-          url: "http://httpbin.org/ip"
-          method: 'GET'
+          url: 'http://httpbin.org/ip'
       - name: Show Response
-        run: echo ${{ steps.myRequest.outputs.response }}
-      - name: Make Request
-        id: myRequest2
-        uses: fjogeleit/http-request-action@master
-        with:
-          url: "http://httpbin.org/ip"
-          method: 'GET'
-      - name: Show Response2
-        run: echo ${{ fromJson(steps.myRequest2.outputs.response) }}
+        run: echo ${{ steps.re.outputs.headers }}
