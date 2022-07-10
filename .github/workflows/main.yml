@@ -23,6 +23,7 @@ jobs:
         run: |
           echo ${{ steps.re.outputs.headers }}
           echo ${{ steps.re.outputs.status }}
+          echo ${{ steps.re.outputs.response }}
           echo ${{ fromJson(steps.re.outputs.headers).content-type }}
           echo "SSESS=${{ fromJson(steps.re.outputs.headers).content-type }}" >> $GITHUB_ENV
           : # 改行付き echo であることに注目
