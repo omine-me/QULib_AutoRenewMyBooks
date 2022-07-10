@@ -11,22 +11,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  deployment:
+  QULib_AutoRenewMyBooks:
     runs-on: ubuntu-latest
+    name: A job to say hello
     steps:
-      - name: https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re
-        id: re
-        uses: CamiloGarciaLaRotta/watermelon-http-client@v1
-        with:
-          url: 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re'
-      - name: Show Response
-        run: |
-          echo ${{ steps.re.outputs.headers }}
-          echo ${{ steps.re.outputs.status }}
-          echo ${{ steps.re.outputs.response }}
-          echo ${{ fromJson(steps.re.outputs.headers).content-type }}
-          echo "SSESS=${{ fromJson(steps.re.outputs.headers).content-type }}" >> $GITHUB_ENV
-          : # 改行付き echo であることに注目
-      - name: Step2
-        run: |
-          echo "The SSESS is ${{ env.SSESS }}"
+      - name: Hello world action step
+        id: hello
+        uses: omine-me/QULib_AutoRenewMyBooks@main
+      # Use the output from the `hello` step
+#       - name: Get the output time
+#         run: echo "The time was ${{ steps.hello.outputs.time }}"
+
+# jobs:
+#   deployment:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re
+#         id: re
+#         uses: CamiloGarciaLaRotta/watermelon-http-client@v1
+#         with:
+#           url: 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re'
+#       - name: Show Response
+#         run: |
+#           echo ${{ steps.re.outputs.headers }}
+#           echo ${{ steps.re.outputs.status }}
+#           echo ${{ steps.re.outputs.response }}
+#           echo ${{ fromJson(steps.re.outputs.headers).content-type }}
+#           echo "SSESS=${{ fromJson(steps.re.outputs.headers).content-type }}" >> $GITHUB_ENV
+#           : # 改行付き echo であることに注目
+#       - name: Step2
+#         run: |
+#           echo "The SSESS is ${{ env.SSESS }}"
