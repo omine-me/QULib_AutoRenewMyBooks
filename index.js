@@ -1,11 +1,31 @@
 const core = require('@actions/core');
 // const github = require('@actions/github');
 const axios = require('axios');
+const cheerio = require('cheerio');
 
 let redirectUrl = "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"
 axios.get(redirectUrl, {withCredentials: true})
     .then((res) => {
-        console.log(res);
+//         console.log(res);
+        const $ = cheerio.load(res.data);
+        const RelayState = $('[name="RelayState"]').val();
+        console.log('RelayState: ', RelayState);
+        const SAMLRequest = $('[name="SAMLRequest"]').val();
+        console.log('SAMLRequest: ', SAMLRequest);
+        redirectUrl = "https://idp.kyushu-u.ac.jp/idp/profile/SAML2/POST/SSO"
+    
+        axios.post(redirectUrl, {RelayState: RelayState, SAMLRequest: SAMLRequest},{withCredentials: true})
+            .then((res) => {
+                console.log(res);
+//                 const $ = cheerio.load(res.data);
+
+            })
+            .catch(err => {
+                console.log("err:", err);
+            });
+    
+    
+    
     })
     .catch(err => {
         console.log("err:", err);
