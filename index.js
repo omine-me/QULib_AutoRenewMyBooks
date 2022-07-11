@@ -4,28 +4,28 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 let redirectUrl = "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"
-axios.get(redirectUrl, {withCredentials: true})
+axios.get(redirectUrl, {withCredentials: true,maxRedirects: 0})
     .then((res) => {
-        console.log(res.data);
-        const $ = cheerio.load(res.data);
-        const RelayState = $('[name="RelayState"]').val();
-        console.log('RelayState: ', RelayState);
-        const SAMLRequest = $('[name="SAMLRequest"]').val();
-        console.log('SAMLRequest: ', SAMLRequest);
-        redirectUrl = "https://idp.kyushu-u.ac.jp/idp/profile/SAML2/POST/SSO"
+        console.log(res);
+//         const $ = cheerio.load(res.data);
+//         const RelayState = $('[name="RelayState"]').val();
+//         console.log('RelayState: ', RelayState);
+//         const SAMLRequest = $('[name="SAMLRequest"]').val();
+//         console.log('SAMLRequest: ', SAMLRequest);
+//         redirectUrl = "https://idp.kyushu-u.ac.jp/idp/profile/SAML2/POST/SSO"
         
-        let params = new URLSearchParams()
-        params.append('RelayState', RelayState)
-        params.append('SAMLRequest', SAMLRequest)
-        axios.post(redirectUrl, params,{withCredentials: true}) 
-            .then((res) => {
-                console.log(res);
-//                 const $ = cheerio.load(res.data);
+//         let params = new URLSearchParams()
+//         params.append('RelayState', RelayState)
+//         params.append('SAMLRequest', SAMLRequest)
+//         axios.post(redirectUrl, params,{withCredentials: true}) 
+//             .then((res) => {
+//                 console.log(res);
+// //                 const $ = cheerio.load(res.data);
 
-            })
-            .catch(err => {
-                console.log("err:", err);
-            });
+//             })
+//             .catch(err => {
+//                 console.log("err:", err);
+//             });
     
     
     
