@@ -19,6 +19,7 @@
   "homepage": "https://github.com/omine-me/QULib_AutoRenewMyBooks#readme",
   "dependencies": {
     "@actions/core": "^1.9.0",
-    "axios": "^0.27.2"
+    "axios": "^0.27.2",
+    "cheerio": "^1.0.0-rc.12"
   }
 }
