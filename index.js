@@ -2,9 +2,12 @@ const core = require('@actions/core');
 // const github = require('@actions/github');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const AxiosCookiejarSupport = require('axios-cookiejar-support').default;
+
+AxiosCookiejarSupport(axios);
 
 let redirectUrl = "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"
-axios.get(redirectUrl, {withCredentials: true,maxRedirects: 0})
+axios.get(redirectUrl, {withCredentials: true, jar: true})
     .then((res) => {
         console.log(res);
 //         const $ = cheerio.load(res.data);
