@@ -1,19 +1,32 @@
-const
-  axios = require('axios').default,
-  { CookieJar } = require('tough-cookie'),
-  { HttpCookieAgent, HttpsCookieAgent } = require('http-cookie-agent');
+// const
+//   axios = require('axios').default,
+//   { CookieJar } = require('tough-cookie'),
+//   { HttpCookieAgent, HttpsCookieAgent } = require('http-cookie-agent');
+
+// const jar = new CookieJar();
+
+// axios.defaults.httpAgent = new HttpCookieAgent({
+//   jar,
+//   keepAlive: true,
+//   rejectUnauthorized: false, // disable CA checks
+// });
+// axios.defaults.headers.common = {
+//   'User-Agent': 'HTTPie/2.3.0',
+//   Accept: '*/*',
+// };
+
+import axios from 'axios';
+import { CookieJar } from 'tough-cookie';
+import { HttpCookieAgent, HttpsCookieAgent } from 'http-cookie-agent/http';
 
 const jar = new CookieJar();
 
-axios.defaults.httpAgent = new HttpCookieAgent({
-  jar,
-  keepAlive: true,
-  rejectUnauthorized: false, // disable CA checks
+const client = axios.create({
+  httpAgent: new HttpCookieAgent({ cookies: { jar } }),
+  httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
+  withCredentials: true,
 });
-axios.defaults.headers.common = {
-  'User-Agent': 'HTTPie/2.3.0',
-  Accept: '*/*',
-};
+
 
 
 // const core = require('@actions/core');
@@ -25,12 +38,12 @@ axios.defaults.headers.common = {
 // const tough = require('tough-cookie');
 // const cookieJar = new tough.CookieJar();
 // AxiosCookieJarSupport(axios);
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 // axios.defaults.jar = cookieJar;
 
 
 let redirectUrl = "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"
-axios.get(redirectUrl)
+client.get(redirectUrl)
     .then((res) => {
         console.log(res);
 //         const $ = cheerio.load(res.data);
