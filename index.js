@@ -4,10 +4,15 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const AxiosCookiejarSupport = require('axios-cookiejar-support').default;
 
-AxiosCookiejarSupport(axios);
+const tough = require('tough-cookie');
+const cookieJar = new tough.CookieJar();
+AxiosCookieJarSupport(axios);
+axios.defaults.withCredentials = true;
+axios.defaults.jar = cookieJar;
+
 
 let redirectUrl = "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"
-axios.get(redirectUrl, {withCredentials: true, jar: true})
+axios.get(redirectUrl)
     .then((res) => {
         console.log(res);
 //         const $ = cheerio.load(res.data);
