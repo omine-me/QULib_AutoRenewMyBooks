@@ -1,27 +1,32 @@
-import axios from 'axios';
-import { wrapper } from 'axios-cookiejar-support';
-import { CookieJar } from 'tough-cookie';
+const
+  axios = require('axios').default,
+  { CookieJar } = require('tough-cookie'),
+  { HttpCookieAgent, HttpsCookieAgent } = require('http-cookie-agent');
 
 const jar = new CookieJar();
-const client = wrapper(axios.create({ jar }));
 
-const { config } = await client.get('https://httpbin.org/cookies/set/session/userid');
+axios.defaults.httpAgent = new HttpCookieAgent({
+  jar,
+  keepAlive: true,
+  rejectUnauthorized: false, // disable CA checks
+});
+axios.defaults.headers.common = {
+  'User-Agent': 'HTTPie/2.3.0',
+  Accept: '*/*',
+};
 
-console.log(config.jar.toJSON());
 
-return 
+// const core = require('@actions/core');
+// // const github = require('@actions/github');
+// const axios = require('axios');
+// const cheerio = require('cheerio');
+// const AxiosCookiejarSupport = require('axios-cookiejar-support').default;
 
-const core = require('@actions/core');
-// const github = require('@actions/github');
-const axios = require('axios');
-const cheerio = require('cheerio');
-const AxiosCookiejarSupport = require('axios-cookiejar-support').default;
-
-const tough = require('tough-cookie');
-const cookieJar = new tough.CookieJar();
-AxiosCookieJarSupport(axios);
+// const tough = require('tough-cookie');
+// const cookieJar = new tough.CookieJar();
+// AxiosCookieJarSupport(axios);
 axios.defaults.withCredentials = true;
-axios.defaults.jar = cookieJar;
+// axios.defaults.jar = cookieJar;
 
 
 let redirectUrl = "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"
