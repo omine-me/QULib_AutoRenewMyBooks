@@ -9,5 +9,5 @@ description: 'Automatically renew books I borrow from Kyushu-u library'
 #   time: # id of output
 #     description: 'The time we greeted you'
 runs:
-  using: 'node'
+  using: 'node14'
   main: 'index.mjs'
