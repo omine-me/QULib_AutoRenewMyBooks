@@ -16,16 +16,46 @@
 // };
 
 import axios from 'axios';
-import { CookieJar } from 'tough-cookie';
-import { HttpCookieAgent, HttpsCookieAgent } from 'http-cookie-agent/http';
+import * as cheerio from 'cheerio';
+// const cheerio = require('cheerio');
+// import { CookieJar } from 'tough-cookie';
+// import { HttpCookieAgent, HttpsCookieAgent } from 'http-cookie-agent/http';
 
-const jar = new CookieJar();
+// const jar = new CookieJar();
 
 const client = axios.create({
-  httpAgent: new HttpCookieAgent({ cookies: { jar } }),
-  httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
+  // httpAgent: new HttpCookieAgent({ cookies: { jar } }),
+  // httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
   withCredentials: true,
+  maxRedirects: 0,
+  validateStatus: status => status < 500,
 });
+
+/**
+ * Cookieのユーティリティクラス
+ */
+class CookieUtil {
+  /**
+   * 値を抽出
+   * @param {string} cookie Cookieデータ（"name=value;...")
+   * @return {string} value
+   */
+  static getValue(cookies, key) {
+    // const cookiesArray = cookies.split(';');
+    const cookiesArray = cookies.split('; ');
+
+    for(const c of cookiesArray){
+      const cArray = c.split('=');
+      // if(cArray[0] == key){
+      if(cArray[0].match(key)){
+        console.log(cArray)
+        return cArray //cArray[0] is name, cArray[1] is value
+      }
+    }
+
+    return false
+  }
+}
 
 
 
@@ -43,35 +73,57 @@ const client = axios.create({
 
 
 let redirectUrl = "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"
-client.get(redirectUrl)
-    .then((res) => {
-        console.log(res);
-//         const $ = cheerio.load(res.data);
-//         const RelayState = $('[name="RelayState"]').val();
-//         console.log('RelayState: ', RelayState);
-//         const SAMLRequest = $('[name="SAMLRequest"]').val();
-//         console.log('SAMLRequest: ', SAMLRequest);
-//         redirectUrl = "https://idp.kyushu-u.ac.jp/idp/profile/SAML2/POST/SSO"
-        
-//         let params = new URLSearchParams()
-//         params.append('RelayState', RelayState)
-//         params.append('SAMLRequest', SAMLRequest)
-//         axios.post(redirectUrl, params,{withCredentials: true}) 
-//             .then((res) => {
-//                 console.log(res);
-// //                 const $ = cheerio.load(res.data);
+let res = await client.get(redirectUrl)
+// console.log(res.headers["set-cookie"][0])
+let cookie_SSESS = CookieUtil.getValue(res.headers["set-cookie"][0], 'SSESS')
+console.log(cookie_SSESS)
 
-//             })
-//             .catch(err => {
-//                 console.log("err:", err);
-//             });
+redirectUrl = "https://www.lib.kyushu-u.ac.jp/Shibboleth.sso/Login?target=/ja/activities/usage_ref/re"
+res = await client.get(redirectUrl, { headers: { Cookie: cookie_SSESS[0]+"="+cookie_SSESS[1] } })
+// console.log(res.headers)
+let cookie_opensaml_req_ss = CookieUtil.getValue(res.headers["set-cookie"][0], "opensaml")
+redirectUrl = res.headers["location"]
+
+res = await client.get(redirectUrl)
+let cookie_JSESSIONID = CookieUtil.getValue(res.headers["set-cookie"][0], "JSESSIONID")
+redirectUrl = res.headers["location"]
+redirectUrl = "https://idp.kyushu-u.ac.jp"+redirectUrl
+
+res = await client.get(redirectUrl, { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]} })
+let $ = cheerio.load(res.data)
+let token = $('[name="csrf_token"]').val()
+console.log("csrf_token", token)
+
+
+// client.get(redirectUrl)
+//     .then((res) => {
+//         console.log(res);
+// //         const $ = cheerio.load(res.data);
+// //         const RelayState = $('[name="RelayState"]').val();
+// //         console.log('RelayState: ', RelayState);
+// //         const SAMLRequest = $('[name="SAMLRequest"]').val();
+// //         console.log('SAMLRequest: ', SAMLRequest);
+// //         redirectUrl = "https://idp.kyushu-u.ac.jp/idp/profile/SAML2/POST/SSO"
+        
+// //         let params = new URLSearchParams()
+// //         params.append('RelayState', RelayState)
+// //         params.append('SAMLRequest', SAMLRequest)
+// //         axios.post(redirectUrl, params,{withCredentials: true}) 
+// //             .then((res) => {
+// //                 console.log(res);
+// // //                 const $ = cheerio.load(res.data);
+
+// //             })
+// //             .catch(err => {
+// //                 console.log("err:", err);
+// //             });
     
     
     
-    })
-    .catch(err => {
-        console.log("err:", err);
-    });
+//     })
+//     .catch(err => {
+//         console.log("err:", err);
+//     });
 
 
 // let cookies = response.getHeaders()["Set-Cookie"];
