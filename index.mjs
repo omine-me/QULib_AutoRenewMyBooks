@@ -1,45 +1,17 @@
-// const
-//   axios = require('axios').default,
-//   { CookieJar } = require('tough-cookie'),
-//   { HttpCookieAgent, HttpsCookieAgent } = require('http-cookie-agent');
-
-// const jar = new CookieJar();
-
-// axios.defaults.httpAgent = new HttpCookieAgent({
-//   jar,
-//   keepAlive: true,
-//   rejectUnauthorized: false, // disable CA checks
-// });
-// axios.defaults.headers.common = {
-//   'User-Agent': 'HTTPie/2.3.0',
-//   Accept: '*/*',
-// };
-
-import { saveState } from '@actions/core';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-// const cheerio = require('cheerio');
-// import { CookieJar } from 'tough-cookie';
-// import { HttpCookieAgent, HttpsCookieAgent } from 'http-cookie-agent/http';
-
-// const jar = new CookieJar();
 
 const client = axios.create({
-  // httpAgent: new HttpCookieAgent({ cookies: { jar } }),
-  // httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
   // withCredentials: true,
   maxRedirects: 0,
   validateStatus: status => status < 500,
 });
 
-axios.interceptors.request.use(request => {
-  console.log('Starting Request: ', request)
-  return request
-})
+// axios.interceptors.request.use(request => {
+//   console.log('Starting Request: ', request)
+//   return request
+// })
 
-/**
- * Cookieのユーティリティクラス
- */
 class CookieUtil {
   /**
    * 値を抽出
@@ -54,7 +26,7 @@ class CookieUtil {
       const cArray = c.split('=');
       // if(cArray[0] == key){
       if(cArray[0].match(key)){
-        console.log(cArray)
+        // console.log(cArray)
         return cArray //cArray[0] is name, cArray[1] is value
       }
     }
@@ -63,26 +35,24 @@ class CookieUtil {
   }
 }
 
+const isToday = (now ,inputDate) => {
+  console.log("isToday",now, now.getDate(),now.getDate()+1,now.getDate()+8)
+  return inputDate.getDate() == now.getDate()+8 &&
+    inputDate.getMonth() == now.getMonth() &&
+    inputDate.getFullYear() == now.getFullYear()
+}
 
-
-// const core = require('@actions/core');
-// // const github = require('@actions/github');
-// const axios = require('axios');
-// const cheerio = require('cheerio');
-// const AxiosCookiejarSupport = require('axios-cookiejar-support').default;
-
-// const tough = require('tough-cookie');
-// const cookieJar = new tough.CookieJar();
-// AxiosCookieJarSupport(axios);
-// axios.defaults.withCredentials = true;
-// axios.defaults.jar = cookieJar;
-
+const isWithinNDays = (now, inputDate, withinDays=6) => {
+  const nDaysLater = new Date(now.getTime())
+  nDaysLater.setDate(now.getDate()+withinDays)
+  console.log(inputDate , nDaysLater)
+  return inputDate < nDaysLater
+}
 
 let redirectUrl = 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re'
 let res = await client.get(redirectUrl)
-// console.log(res.headers['set-cookie'][0])
 let cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
-console.log(cookie_SSESS)
+// console.log(cookie_SSESS)
 
 redirectUrl = 'https://www.lib.kyushu-u.ac.jp/Shibboleth.sso/Login?target=/ja/activities/usage_ref/re'
 res = await client.get(redirectUrl, { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1] } })
@@ -99,18 +69,17 @@ res = await client.get(redirectUrl, { headers: { Cookie: 'JSESSIONID=' + cookie_
 let $ = cheerio.load(res.data)
 let token = $('[name="csrf_token"]').val()
 // console.log('csrf_token', token)
-// console.log('csrf_token', res.data)
 
 const postform = new URLSearchParams({'csrf_token': token,
-'shib_idp_ls_exception.shib_idp_session_ss': '',
-'shib_idp_ls_success.shib_idp_session_ss': 'false',
-'shib_idp_ls_value.shib_idp_session_ss': '',
-'shib_idp_ls_exception.shib_idp_persistent_ss': '',
-'shib_idp_ls_success.shib_idp_persistent_ss': 'false',
-'shib_idp_ls_value.shib_idp_persistent_ss': '',
-'shib_idp_ls_supported': '',
-'_eventId_proceed': '',})
-console.log(postform)
+                                      'shib_idp_ls_exception.shib_idp_session_ss': '',
+                                      'shib_idp_ls_success.shib_idp_session_ss': 'false',
+                                      'shib_idp_ls_value.shib_idp_session_ss': '',
+                                      'shib_idp_ls_exception.shib_idp_persistent_ss': '',
+                                      'shib_idp_ls_success.shib_idp_persistent_ss': 'false',
+                                      'shib_idp_ls_value.shib_idp_persistent_ss': '',
+                                      'shib_idp_ls_supported': '',
+                                      '_eventId_proceed': '',})
+// console.log(postform)
 res = await axios.post(redirectUrl,
                       postform,
                       { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]} }
@@ -125,8 +94,8 @@ redirectUrl = "https://idp.kyushu-u.ac.jp/idp/profile/SAML2/Redirect/SSO?executi
 res = await client.get(redirectUrl, { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]} })
 $ = cheerio.load(res.data)
 token = $('[name="csrf_token"]').val()
-console.log('116 data', res.data)
-console.log('116 csrf_token', token)
+// console.log('116 data', res.data)
+// console.log('116 csrf_token', token)
 
 res = await client.post(redirectUrl,
   new URLSearchParams({
@@ -154,19 +123,52 @@ allCookie = allCookie.replace(replaceWord, '; '); //getAllHeadersの場合
 let cookie_shibsession = CookieUtil.getValue(allCookie, 'shibsession')
 
 res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
-// res = res.data.slice(res.data.indexOf('<body'))
 $ = cheerio.load(res.data)
-// console.log(res)
-// console.log($('#ecats_ref_borrow').val())
-const span = []
-let span_txt
-let validSpanCount = 0;
-$('span', '.ecats_ref_list' ).each((i, elem) => {   //'m_unit'クラス内のh3タグ内要素に対して処理実行
-  span_txt = $(elem).text()
-  if (span_txt.match(/返却期限 2/)){
-    span[validSpanCount] = new Date(span_txt.slice(span_txt.indexOf("2")).replace(/\./g, '-')) //"返却期限 2022.08.01"　などから2以降の文字列を取り出し、.を-に置き換え、日付に変換
-    validSpanCount++;
-  }
+// console.log(span)
+// -----------------------------以上ページ取得-----------------------------
 
+// タイトル、返却期限、延長可能か、target_keyを取得
+const bookData = []
+const numberRegex = /[^0-9]/g;
+$('ul[class="line_block clearfix"]').each((i, elem) => {
+  // console.log("inside: ",$(elem).text())
+  let returnDate;
+  let title = $("h4", elem).text()
+  let renewable = false;
+  let target_key;
+  $('span', elem).each((i, span) => {
+    let span_txt = $(span).text()
+    if (span_txt.match(/返却期限 2/)){
+      returnDate = new Date(span_txt.slice(span_txt.indexOf("2")).replace(/\./g, '-')) //"返却期限 2022.08.01"　などから2以降の文字列を取り出し、.を-に置き換え、日付に変換
+      // validSpanCount++;
+    }
+  })
+  $('li[class="line btn"]', elem).each((i, li) => {
+    // renewable = li.find("input")
+    // console.log($(li).first())
+    $("input", li).each((i, input) => {
+      if ($(input).attr("value") == "貸出更新"){
+        renewable = true;
+        target_key = $(input).attr("onclick").replace(numberRegex, "")
+      }
+    })
+  })
+  bookData.push({"title": title, "returnDate": returnDate, "renewable": renewable, "target_key": target_key})
+  // console.log(title, renewable, returnDate, target_key)
 })
-console.log(span)
+
+// console.log(bookData)
+const nowUTC = new Date();
+const nowTokyo = new Date(nowUTC.setHours(nowUTC.getHours()+9))
+console.log("tokyoの現在時刻:", nowTokyo)
+// console.log("tokyoの現在時刻:", new Date().setTime())
+bookData.forEach((elem)=>{
+  if (isToday(nowTokyo, elem.returnDate)){
+    console.log("today",elem.title)
+  }
+})
+bookData.forEach((elem)=>{
+  if (isWithinNDays(nowTokyo, elem.returnDate, 8)){
+    console.log("within",elem.title)
+  }
+})
