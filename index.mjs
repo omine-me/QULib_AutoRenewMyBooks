@@ -36,7 +36,7 @@ class CookieUtil {
 }
 
 const isToday = (now ,inputDate) => {
-  console.log("isToday",now, now.getDate(),now.getDate()+1,now.getDate()+8)
+  // console.log("isToday",now, now.getDate(),now.getDate()+1,now.getDate()+8)
   return inputDate.getDate() == now.getDate()+8 &&
     inputDate.getMonth() == now.getMonth() &&
     inputDate.getFullYear() == now.getFullYear()
@@ -45,7 +45,7 @@ const isToday = (now ,inputDate) => {
 const isWithinNDays = (now, inputDate, withinDays=6) => {
   const nDaysLater = new Date(now.getTime())
   nDaysLater.setDate(now.getDate()+withinDays)
-  console.log(inputDate , nDaysLater)
+  // console.log(inputDate , nDaysLater)
   return inputDate < nDaysLater
 }
 
@@ -160,15 +160,23 @@ $('ul[class="line_block clearfix"]').each((i, elem) => {
 // console.log(bookData)
 const nowUTC = new Date();
 const nowTokyo = new Date(nowUTC.setHours(nowUTC.getHours()+9))
+let messege = ""
 console.log("tokyoの現在時刻:", nowTokyo)
 // console.log("tokyoの現在時刻:", new Date().setTime())
 bookData.forEach((elem)=>{
   if (isToday(nowTokyo, elem.returnDate)){
     console.log("today",elem.title)
+    messege+=elem.title+", "
   }
 })
 bookData.forEach((elem)=>{
-  if (isWithinNDays(nowTokyo, elem.returnDate, 8)){
+  if (isWithinNDays(nowTokyo, elem.returnDate, 6)){
     console.log("within",elem.title)
   }
 })
+
+await client.post('https://notify-api.line.me/api/notify',
+                      new URLSearchParams({
+                        'message': "以下の本を延長しました："+messege
+                      }),
+                      { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
