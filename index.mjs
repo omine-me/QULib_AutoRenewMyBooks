@@ -122,7 +122,8 @@ const replaceWord = /,/g
 allCookie = allCookie.replace(replaceWord, '; '); //getAllHeadersの場合
 let cookie_shibsession = CookieUtil.getValue(allCookie, 'shibsession')
 
-res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
+res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
+cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
 $ = cheerio.load(res.data)
 // console.log(span)
 // -----------------------------以上ページ取得-----------------------------
@@ -211,8 +212,8 @@ console.log(res)
 res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
 console.log(res)
 
-await client.post('https://notify-api.line.me/api/notify',
-                  new URLSearchParams({
-                    'message': "以下の本を延長しました："+messege
-                  }),
-                  { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
+// await client.post('https://notify-api.line.me/api/notify',
+//                   new URLSearchParams({
+//                     'message': "以下の本を延長しました："+messege
+//                   }),
+//                   { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
