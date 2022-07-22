@@ -198,6 +198,7 @@ res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/
                           "active_page_top": 1,
                           "disp_count": 10,
                           "sort": "re.rtnlimdt-_-asc",
+                          "target_key[]": target_key,
                           "active_page_bottom": 1,
                           'form_build_id': form_build_id,
                           'form_token': form_token,
