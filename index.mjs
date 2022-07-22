@@ -37,7 +37,7 @@ class CookieUtil {
 
 const isToday = (now ,inputDate) => {
   // console.log("isToday",now, now.getDate(),now.getDate()+1,now.getDate()+8)
-  return inputDate.getDate() == now.getDate()+8 &&
+  return inputDate.getDate() == now.getDate()+3 &&
     inputDate.getMonth() == now.getMonth() &&
     inputDate.getFullYear() == now.getFullYear()
 }
@@ -127,6 +127,8 @@ $ = cheerio.load(res.data)
 // console.log(span)
 // -----------------------------以上ページ取得-----------------------------
 
+const form_build_id = $('[name="form_build_id"]').val()
+const form_token = $('[name="form_token"]').val()
 // タイトル、返却期限、延長可能か、target_keyを取得
 const bookData = []
 const numberRegex = /[^0-9]/g;
@@ -161,12 +163,17 @@ $('ul[class="line_block clearfix"]').each((i, elem) => {
 const nowUTC = new Date();
 const nowTokyo = new Date(nowUTC.setHours(nowUTC.getHours()+9))
 let messege = ""
+let target_key =""
 console.log("tokyoの現在時刻:", nowTokyo)
-// console.log("tokyoの現在時刻:", new Date().setTime())
 bookData.forEach((elem)=>{
   if (isToday(nowTokyo, elem.returnDate)){
+    if (target_key != "") {
+      target_key += ",";
+      messege+=", "
+    }
+    target_key += elem.target_key;
+    messege+=elem.title
     console.log("today",elem.title)
-    messege+=elem.title+", "
   }
 })
 bookData.forEach((elem)=>{
@@ -175,8 +182,29 @@ bookData.forEach((elem)=>{
   }
 })
 
+
+console.log({
+  'form_build_id': form_build_id,
+  'form_token': form_token,
+  "form_id": "ecats_ref_borrow_re",
+  "page": 1,
+  "target_key": target_key,
+  "act": "ext",
+})
+// res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
+//                         new URLSearchParams({
+//                           'form_build_id': form_build_id,
+//                           'form_token': form_token,
+//                           "form_id": "ecats_ref_borrow_re",
+//                           "page": 1,
+//                           "target_key": target_key,
+//                           "act": "ext",
+//                         }),
+//                         { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
+// console.log(res)
+
 await client.post('https://notify-api.line.me/api/notify',
-                      new URLSearchParams({
-                        'message': "以下の本を延長しました："+messege
-                      }),
-                      { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
+                  new URLSearchParams({
+                    'message': "以下の本を延長しました："+messege
+                  }),
+                  { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
