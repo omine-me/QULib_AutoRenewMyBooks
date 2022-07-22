@@ -178,30 +178,31 @@ bookData.forEach((elem)=>{
 })
 bookData.forEach((elem)=>{
   if (isWithinNDays(nowTokyo, elem.returnDate, 6)){
-    console.log("within",elem.title)
+    if (elem.renewable){
+      console.log("within&renewable",elem.title)
+    }
   }
 })
 
-
-console.log({
-  'form_build_id': form_build_id,
-  'form_token': form_token,
-  "form_id": "ecats_ref_borrow_re",
-  "page": 1,
-  "target_key": target_key,
-  "act": "ext",
-})
-// res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
-//                         new URLSearchParams({
-//                           'form_build_id': form_build_id,
-//                           'form_token': form_token,
-//                           "form_id": "ecats_ref_borrow_re",
-//                           "page": 1,
-//                           "target_key": target_key,
-//                           "act": "ext",
-//                         }),
-//                         { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
-// console.log(res)
+// console.log({
+//   'form_build_id': form_build_id,
+//   'form_token': form_token,
+//   "form_id": "ecats_ref_borrow_re",
+//   "page": 1,
+//   "target_key": target_key,
+//   "act": "ext",
+// })
+res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
+                        new URLSearchParams({
+                          'form_build_id': form_build_id,
+                          'form_token': form_token,
+                          "form_id": "ecats_ref_borrow_re",
+                          "page": 1,
+                          "target_key": target_key,
+                          "act": "ext",
+                        }),
+                        { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
+console.log(res)
 
 await client.post('https://notify-api.line.me/api/notify',
                   new URLSearchParams({
