@@ -209,10 +209,10 @@ res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/
                           "act": "ext",
                         }),
                         { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
-console.log(res)
+// console.log(res)
 
 res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
-console.log(res)
+// console.log(res)
 
 // GITHUB Actions Scheduleの更新
 const octokit = new Octokit({ auth: process.env.GITTOHABU_TOKEN });
@@ -234,14 +234,14 @@ name: QULib_AutoRenewMyBooks
               PW: \${{secrets.PW}}
               LINE_TOKEN: \${{secrets.LINE_TOKEN}}
               GITTOHABU_TOKEN: \${{secrets.GITTOHABU_TOKEN}}
-              GITTOHABU_OWNER: \$GITHUB_REPOSITORY_OWNER
-              GITTOHABU_REPO: \${GITHUB_REPOSITORY#\${GITHUB_REPOSITORY_OWNER}/}
+              # GITTOHABU_OWNER: \$GITHUB_REPOSITORY_OWNER
+              # GITTOHABU_REPO: \${GITHUB_REPOSITORY#\${GITHUB_REPOSITORY_OWNER}/}
             uses: omine-me/QULib_AutoRenewMyBooks@main
     
 `
 const target = {
-  owner: process.env.GITTOHABU_OWNER,
-  repo: process.env.GITTOHABU_REPO,
+  owner: "omine-me",
+  repo: "QULib_AutoRenewMyBooks",
   branch: "main"
 };
 (async () => {
@@ -258,7 +258,6 @@ const target = {
     tree: [{
       type: "blob",
       path: ".github/workflows/test1.yml",
-      // path: "test_file.txt",
       mode: "100644",
       sha: createdBlob.sha
     }],
@@ -268,7 +267,6 @@ const target = {
   const createdCommit = (await octokit.rest.git.createCommit({
     ...target,
     message: "Update GitHub Actions Schedule",
-    // message: "Update test_file.txt",
     tree: createdTree.sha,
     parents: [latestCommit.sha],
   })).data;
