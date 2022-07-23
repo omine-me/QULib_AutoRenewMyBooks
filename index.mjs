@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import {Octokit} from "octokit";
 
 const client = axios.create({
   // withCredentials: true,
@@ -212,6 +213,74 @@ console.log(res)
 
 res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
 console.log(res)
+
+// GITHUB Actions Scheduleの更新
+const octokit = new Octokit({ auth: process.env.GITTOHABU_TOKEN });
+const content = `
+name: QULib_AutoRenewMyBooks
+
+    on:
+      workflow_dispatch:
+    
+    jobs:
+      QULib_AutoRenewMyBooks:
+        runs-on: ubuntu-latest
+        name: main
+        steps:
+          - name: main step
+            id: main
+            env:
+              USERNAME: \${{secrets.USERNAME}}
+              PW: \${{secrets.PW}}
+              LINE_TOKEN: \${{secrets.LINE_TOKEN}}
+              GITTOHABU_TOKEN: \${{secrets.GITTOHABU_TOKEN}}
+              GITTOHABU_OWNER: \$GITHUB_REPOSITORY_OWNER
+              GITTOHABU_REPO: \${GITHUB_REPOSITORY#\${GITHUB_REPOSITORY_OWNER}/}
+            uses: omine-me/QULib_AutoRenewMyBooks@main
+    
+`
+const target = {
+  owner: process.env.GITTOHABU_OWNER,
+  repo: process.env.GITTOHABU_REPO,
+  branch: "main"
+};
+(async () => {
+  const latestCommit = (await octokit.rest.repos.getBranch(target)).data.commit;
+
+  const createdBlob = (await octokit.rest.git.createBlob({
+    ...target,
+    content: Buffer.from(content, "utf-8").toString("base64"),
+    encoding: "base64"
+  })).data;
+
+  const createdTree = (await octokit.rest.git.createTree({
+    ...target,
+    tree: [{
+      type: "blob",
+      path: ".github/workflows/test1.yml",
+      // path: "test_file.txt",
+      mode: "100644",
+      sha: createdBlob.sha
+    }],
+    base_tree: latestCommit.sha
+  })).data;
+
+  const createdCommit = (await octokit.rest.git.createCommit({
+    ...target,
+    message: "Update GitHub Actions Schedule",
+    // message: "Update test_file.txt",
+    tree: createdTree.sha,
+    parents: [latestCommit.sha],
+  })).data;
+
+  await octokit.rest.git.updateRef({
+    ...target,
+    ref: `heads/${target.branch}`,
+    sha: createdCommit.sha
+  });
+})().catch( function ( error ) {
+  console.log( error );
+} );;
 
 // await client.post('https://notify-api.line.me/api/notify',
 //                   new URLSearchParams({

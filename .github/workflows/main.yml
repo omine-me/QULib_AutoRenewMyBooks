@@ -1,48 +1,20 @@
-# This is a basic workflow to help you get started with Actions
+name: QULib_AutoRenewMyBooks
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  #   push:
-  #     branches: ["main"]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   QULib_AutoRenewMyBooks:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: main
     steps:
-      - name: Hello world action step
-        id: hello
+      - name: main step
+        id: main
         env:
           USERNAME: ${{secrets.USERNAME}}
           PW: ${{secrets.PW}}
           LINE_TOKEN: ${{secrets.LINE_TOKEN}}
+          GITTOHABU_TOKEN: ${{secrets.GITTOHABU_TOKEN}}
+          GITTOHABU_OWNER: $GITHUB_REPOSITORY_OWNER
+          GITTOHABU_REPO: ${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
         uses: omine-me/QULib_AutoRenewMyBooks@main
-      # Use the output from the `hello` step
-#       - name: Get the output time
-#         run: echo "The time was ${{ steps.hello.outputs.time }}"
-
-# jobs:
-#   deployment:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re
-#         id: re
-#         uses: CamiloGarciaLaRotta/watermelon-http-client@v1
-#         with:
-#           url: 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re'
-#       - name: Show Response
-#         run: |
-#           echo ${{ steps.re.outputs.headers }}
-#           echo ${{ steps.re.outputs.status }}
-#           echo ${{ steps.re.outputs.response }}
-#           echo ${{ fromJson(steps.re.outputs.headers).content-type }}
-#           echo "SSESS=${{ fromJson(steps.re.outputs.headers).content-type }}" >> $GITHUB_ENV
-#           : # 改行付き echo であることに注目
-#       - name: Step2
-#         run: |
-#           echo "The SSESS is ${{ env.SSESS }}"
