@@ -1,5 +1,6 @@
-NaN 61 *'
-    
+name: QULib_AutoRenewMyBooks
+    on:
+      workflow_dispatch:
     jobs:
       QULib_AutoRenewMyBooks:
         runs-on: ubuntu-latest
