@@ -163,7 +163,7 @@ $('ul[class="line_block clearfix"]').each((i, elem) => {
 
 // console.log(bookData)
 const nowUTC = new Date();
-const nowTokyo = new Date(nowUTC.setHours(nowUTC.getHours()+9))
+const nowTokyo = new Date(nowUTC.setHours(nowUTC.getHours()))
 let messege = ""
 let target_key =""
 console.log("tokyoの現在時刻:", nowTokyo)
@@ -178,10 +178,17 @@ bookData.forEach((elem)=>{
     console.log("today",elem.title)
   }
 })
+// 次回実行日の決定
+let next_execute_date = new Date(nowTokyo.setDate(nowTokyo.getDate() + 6));
+next_execute_date.setHours(23, 59);
+console.log("init next_execute_date", next_execute_date)
 bookData.forEach((elem)=>{
   if (isWithinNDays(nowTokyo, elem.returnDate, 6)){
     if (elem.renewable){
-      console.log("within&renewable",elem.title)
+      if (elem.returnDate < next_execute_date){
+        next_execute_date = elem.returnDate
+        console.log("updated next_execute_date", next_execute_date, elem.title)
+      }
     }
   }
 })
@@ -194,25 +201,32 @@ bookData.forEach((elem)=>{
 //   "target_key": target_key,
 //   "act": "ext",
 // })
-res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
-                        new URLSearchParams({
-                          "active_page_top": 1,
-                          "disp_count": 10,
-                          "sort": "re.rtnlimdt-_-asc",
-                          "target_key[]": target_key,
-                          "active_page_bottom": 1,
-                          'form_build_id': form_build_id,
-                          'form_token': form_token,
-                          "form_id": "ecats_ref_borrow_re",
-                          "page": 1,
-                          "target_key": target_key,
-                          "act": "ext",
-                        }),
-                        { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
-// console.log(res)
-
-res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
-// console.log(res)
+if (target_key){
+  res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
+                          new URLSearchParams({
+                            "active_page_top": 1,
+                            "disp_count": 10,
+                            "sort": "re.rtnlimdt-_-asc",
+                            "target_key[]": target_key,
+                            "active_page_bottom": 1,
+                            'form_build_id': form_build_id,
+                            'form_token': form_token,
+                            "form_id": "ecats_ref_borrow_re",
+                            "page": 1,
+                            "target_key": target_key,
+                            "act": "ext",
+                          }),
+                          { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
+  // console.log(res)
+  res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
+  // console.log(res)
+  //notification to Line
+  await client.post('https://notify-api.line.me/api/notify',
+                  new URLSearchParams({
+                    'message': "以下の本を延長しました："+messege
+                  }),
+                  { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
+}
 
 // GITHUB Actions Scheduleの更新
 const octokit = new Octokit({ auth: process.env.GITTOHABU_TOKEN });
@@ -221,6 +235,8 @@ name: QULib_AutoRenewMyBooks
 
     on:
       workflow_dispatch:
+      schedule:
+        - cron: '10 15 `+next_execute_date.getDate()-1+" "+next_execute_date.getMonth()+1+` *'
     
     jobs:
       QULib_AutoRenewMyBooks:
@@ -237,7 +253,6 @@ name: QULib_AutoRenewMyBooks
               # GITTOHABU_OWNER: \$GITHUB_REPOSITORY_OWNER
               # GITTOHABU_REPO: \${GITHUB_REPOSITORY#\${GITHUB_REPOSITORY_OWNER}/}
             uses: omine-me/QULib_AutoRenewMyBooks@main
-    
 `
 const target = {
   owner: "omine-me",
@@ -257,7 +272,7 @@ const target = {
     ...target,
     tree: [{
       type: "blob",
-      path: ".github/workflows/test1.yml",
+      path: ".github/workflows/main.yml",
       mode: "100644",
       sha: createdBlob.sha
     }],
@@ -280,8 +295,9 @@ const target = {
   console.log( error );
 } );;
 
-// await client.post('https://notify-api.line.me/api/notify',
-//                   new URLSearchParams({
-//                     'message': "以下の本を延長しました："+messege
-//                   }),
-//                   { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
+//notification to Line about next exec
+await client.post('https://notify-api.line.me/api/notify',
+                  new URLSearchParams({
+                    'message': "次回の実行日は："+next_execute_date.getMonth()+1+"/"+next_execute_date.getDate()+"です。"
+                  }),
+                  { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
