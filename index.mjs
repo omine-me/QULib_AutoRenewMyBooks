@@ -38,7 +38,7 @@ class CookieUtil {
 
 const isToday = (now ,inputDate) => {
   // console.log("isToday",now, now.getDate(),now.getDate()+1,now.getDate()+8)
-  return inputDate.getDate() == now.getDate()+3 &&
+  return inputDate.getDate() == now.getDate() &&
     inputDate.getMonth() == now.getMonth() &&
     inputDate.getFullYear() == now.getFullYear()
 }
@@ -163,7 +163,7 @@ $('ul[class="line_block clearfix"]').each((i, elem) => {
 
 // console.log(bookData)
 const nowUTC = new Date();
-const nowTokyo = new Date(nowUTC.setHours(nowUTC.getHours()))
+const nowTokyo = new Date(nowUTC.setHours(nowUTC.getHours()+9))
 let messege = ""
 let target_key =""
 console.log("tokyoの現在時刻:", nowTokyo)
@@ -236,7 +236,7 @@ name: QULib_AutoRenewMyBooks
     on:
       workflow_dispatch:
       schedule:
-        - cron: '10 15 `+next_execute_date.getDate()-1+" "+next_execute_date.getMonth()+1+` *'
+        - cron: '10 15 `+(next_execute_date.getDate()-1)+" "+(next_execute_date.getMonth()+1)+` *'
     
     jobs:
       QULib_AutoRenewMyBooks:
@@ -298,6 +298,6 @@ const target = {
 //notification to Line about next exec
 await client.post('https://notify-api.line.me/api/notify',
                   new URLSearchParams({
-                    'message': "次回の実行日は："+next_execute_date.getMonth()+1+"/"+next_execute_date.getDate()+"です。"
+                    'message': "次回の実行日は："+(next_execute_date.getMonth()+1)+"/"+next_execute_date.getDate()+"です。"
                   }),
                   { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
