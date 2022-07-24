@@ -232,27 +232,25 @@ if (target_key){
 const octokit = new Octokit({ auth: process.env.GITTOHABU_TOKEN });
 const content = `
 name: QULib_AutoRenewMyBooks
-
-    on:
-      workflow_dispatch:
-      schedule:
-        - cron: '10 15 `+(next_execute_date.getDate()-1)+" "+(next_execute_date.getMonth()+1)+` *'
-    
-    jobs:
-      QULib_AutoRenewMyBooks:
-        runs-on: ubuntu-latest
-        name: main
-        steps:
-          - name: main step
-            id: main
-            env:
-              USERNAME: \${{secrets.USERNAME}}
-              PW: \${{secrets.PW}}
-              LINE_TOKEN: \${{secrets.LINE_TOKEN}}
-              GITTOHABU_TOKEN: \${{secrets.GITTOHABU_TOKEN}}
-              # GITTOHABU_OWNER: \$GITHUB_REPOSITORY_OWNER
-              # GITTOHABU_REPO: \${GITHUB_REPOSITORY#\${GITHUB_REPOSITORY_OWNER}/}
-            uses: omine-me/QULib_AutoRenewMyBooks@main
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '10 15 `+(next_execute_date.getDate()-1)+" "+(next_execute_date.getMonth()+1)+` *'
+jobs:
+  QULib_AutoRenewMyBooks:
+    runs-on: ubuntu-latest
+    name: main
+    steps:
+      - name: main step
+        id: main
+        env:
+          USERNAME: \${{secrets.USERNAME}}
+          PW: \${{secrets.PW}}
+          LINE_TOKEN: \${{secrets.LINE_TOKEN}}
+          GITTOHABU_TOKEN: \${{secrets.GITTOHABU_TOKEN}}
+          # GITTOHABU_OWNER: \$GITHUB_REPOSITORY_OWNER
+          # GITTOHABU_REPO: \${GITHUB_REPOSITORY#\${GITHUB_REPOSITORY_OWNER}/}
+        uses: omine-me/QULib_AutoRenewMyBooks@main
 `
 const target = {
   owner: "omine-me",
