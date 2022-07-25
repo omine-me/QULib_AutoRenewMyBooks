@@ -131,7 +131,7 @@ if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
   cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
 }
 $ = cheerio.load(res.data)
-// console.log(span)
+console.log("get re", res.headers)
 // -----------------------------以上ページ取得-----------------------------
 
 const form_build_id = $('[name="form_build_id"]').val()
