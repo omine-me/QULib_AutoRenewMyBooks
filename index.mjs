@@ -229,13 +229,14 @@ if (target_key){
 }
 
 // GITHUB Actions Scheduleの更新
+next_execute_date.setDate(next_execute_date.getDate()-1)
 const octokit = new Octokit({ auth: process.env.GITTOHABU_TOKEN });
 const content = `
 name: QULib_AutoRenewMyBooks
 on:
   workflow_dispatch:
   schedule:
-    - cron: '10 15 `+(next_execute_date.getDate()-1)+" "+(next_execute_date.getMonth()+1)+` *'
+    - cron: '10 15 `+(next_execute_date.getDate())+" "+(next_execute_date.getMonth()+1)+` *'
 jobs:
   QULib_AutoRenewMyBooks:
     runs-on: ubuntu-latest
@@ -294,6 +295,7 @@ const target = {
 } );;
 
 //notification to Line about next exec
+next_execute_date.setDate(next_execute_date.getDate()+1)
 await client.post('https://notify-api.line.me/api/notify',
                   new URLSearchParams({
                     'message': "次回の実行日は："+(next_execute_date.getMonth()+1)+"/"+next_execute_date.getDate()+"です。"
