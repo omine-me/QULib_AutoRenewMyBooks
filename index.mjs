@@ -230,10 +230,10 @@ if (target_key){
                             "target_key": target_key,
                             "act": "ext",
                           }),
-                          { headers: { Cookie: cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
+                          { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
   console.log(res.headers)
   if (res.status == 302){
-    res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1]} })
+    res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
     console.log(res.headers)
     //notification to Line
     await client.post('https://notify-api.line.me/api/notify',
