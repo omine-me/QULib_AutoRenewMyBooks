@@ -124,7 +124,9 @@ allCookie = allCookie.replace(replaceWord, '; '); //getAllHeadersの場合
 let cookie_shibsession = CookieUtil.getValue(allCookie, 'shibsession')
 
 res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
-cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
+if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
+  cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
+}
 $ = cheerio.load(res.data)
 // console.log(span)
 // -----------------------------以上ページ取得-----------------------------
@@ -216,16 +218,24 @@ if (target_key){
                             "target_key": target_key,
                             "act": "ext",
                           }),
-                          { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
-  // console.log(res)
-  res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
-  // console.log(res)
-  //notification to Line
-  await client.post('https://notify-api.line.me/api/notify',
-                  new URLSearchParams({
-                    'message': "以下の本を延長しました："+messege
-                  }),
-                  { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
+                          { headers: { Cookie: cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
+  console.log(res.headers)
+  if (res.status == 302){
+    res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1]} })
+    console.log(res.headers)
+    //notification to Line
+    await client.post('https://notify-api.line.me/api/notify',
+    new URLSearchParams({
+      'message': "以下の本を延長しました："+messege
+    }),
+    { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
+  }else{
+    await client.post('https://notify-api.line.me/api/notify',
+    new URLSearchParams({
+      'message': "以下の本の延長処理に失敗："+messege
+    }),
+    { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
+  }
 }
 
 // GITHUB Actions Scheduleの更新
@@ -298,6 +308,6 @@ const target = {
 next_execute_date.setDate(next_execute_date.getDate()+1)
 await client.post('https://notify-api.line.me/api/notify',
                   new URLSearchParams({
-                    'message': "次回の実行日は："+(next_execute_date.getMonth()+1)+"/"+next_execute_date.getDate()+"です。"
+                    'message': "次回の実行日は"+(next_execute_date.getMonth()+1)+"/"+next_execute_date.getDate()+"です。"
                   }),
                   { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
