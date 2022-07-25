@@ -182,27 +182,36 @@ bookData.forEach((elem)=>{
 })
 // 次回実行日の決定
 let next_execute_date = new Date(nowTokyo.setDate(nowTokyo.getDate() + 6));
+nowTokyo.setDate(nowTokyo.getDate()-6)
 next_execute_date.setHours(23, 59);
 console.log("init next_execute_date", next_execute_date)
 bookData.forEach((elem)=>{
-  if (isWithinNDays(nowTokyo, elem.returnDate, 6)){
-    if (elem.renewable){
-      if (elem.returnDate < next_execute_date){
-        next_execute_date = elem.returnDate
-        console.log("updated next_execute_date", next_execute_date, elem.title)
+  if (elem.renewable){
+    if (!(isToday(nowTokyo, elem.returnDate))){ //今日を次回実行日にしない
+      if (isWithinNDays(nowTokyo, elem.returnDate, 6)){
+        if (elem.returnDate < next_execute_date){
+          next_execute_date = elem.returnDate
+          console.log("updated next_execute_date", next_execute_date, elem.title)
+        }
       }
     }
   }
 })
 
-// console.log({
-//   'form_build_id': form_build_id,
-//   'form_token': form_token,
-//   "form_id": "ecats_ref_borrow_re",
-//   "page": 1,
-//   "target_key": target_key,
-//   "act": "ext",
-// })
+console.log({
+  "active_page_top": 1,
+  "disp_count": 10,
+  "sort": "re.rtnlimdt-_-asc",
+  "target_key[]": target_key,
+  "active_page_bottom": 1,
+  'form_build_id': form_build_id,
+  'form_token': form_token,
+  "form_id": "ecats_ref_borrow_re",
+  "page": 1,
+  "target_key": target_key,
+  "act": "ext",
+})
+console.log("Cookie ", cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1])
 if (target_key){
   res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
                           new URLSearchParams({
