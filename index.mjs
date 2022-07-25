@@ -122,6 +122,9 @@ let allCookie = res.headers['set-cookie'].toString()
 const replaceWord = /,/g
 allCookie = allCookie.replace(replaceWord, '; '); //getAllHeadersの場合
 let cookie_shibsession = CookieUtil.getValue(allCookie, 'shibsession')
+if (CookieUtil.getValue(allCookie, 'opensaml')){
+  cookie_opensaml_req_ss = CookieUtil.getValue(allCookie, 'opensaml')
+}
 
 res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
 if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
