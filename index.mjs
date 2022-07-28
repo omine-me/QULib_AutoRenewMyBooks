@@ -8,14 +8,14 @@ const client = axios.create({
   validateStatus: status => status < 500,
 });
 
-axios.interceptors.request.use(request => {
-  console.log('Starting Request: ', request)
-  return request
-})
-axios.interceptors.response.use(response => {
-  console.log('Respose: ', response)
-  return response
-})
+// axios.interceptors.request.use(request => {
+//   console.log('Starting Request: ', request)
+//   return request
+// })
+// axios.interceptors.response.use(response => {
+//   console.log('Respose: ', response)
+//   return response
+// })
 
 class CookieUtil {
   /**
@@ -208,37 +208,24 @@ bookData.forEach((elem)=>{
   }
 })
 
-// console.log({
-//   "active_page_top": 1,
-//   "disp_count": 10,
-//   "sort": "re.rtnlimdt-_-asc",
-//   "target_key[]": target_key,
-//   "active_page_bottom": 1,
-//   'form_build_id': form_build_id,
-//   'form_token': form_token,
-//   "form_id": "ecats_ref_borrow_re",
-//   "page": 1,
-//   "op": "Go",
-//   "target_key": target_key,
-//   "act": "ext",
-// })
+let data = new URLSearchParams({
+  "active_page_top": 1,
+  "disp_count": 10,
+  "sort": "re.rtnlimdt-_-asc",
+  "target_key[]": target_key,
+  "active_page_bottom": 1,
+  'form_build_id': form_build_id,
+  'form_token': form_token,
+  "form_id": "ecats_ref_borrow_re",
+  "page": 1,
+  "op": "Go",
+  "target_key": target_key,
+  "act": "ext",
+})
 // console.log("Cookie ", cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1])
 if (target_key){
   res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
-                          new URLSearchParams({
-                            "active_page_top": 1,
-                            "disp_count": 10,
-                            "sort": "re.rtnlimdt-_-asc",
-                            "target_key[]": target_key,
-                            "active_page_bottom": 1,
-                            'form_build_id': form_build_id,
-                            'form_token': form_token,
-                            "form_id": "ecats_ref_borrow_re",
-                            "page": 1,
-                            "op": "Go",
-                            "target_key": target_key,
-                            "act": "ext",
-                          }),
+                          data,
                           // { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded', Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
                           { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded', Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re", "Content-Length": data.toString().length, Origin: "https://www.lib.kyushu-u.ac.jp"} })
   // console.log(res.headers)
