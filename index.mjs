@@ -8,10 +8,14 @@ const client = axios.create({
   validateStatus: status => status < 500,
 });
 
-// axios.interceptors.request.use(request => {
-//   console.log('Starting Request: ', request)
-//   return request
-// })
+axios.interceptors.request.use(request => {
+  console.log('Starting Request: ', request)
+  return request
+})
+axios.interceptors.response.use(response => {
+  console.log('Respose: ', response)
+  return response
+})
 
 class CookieUtil {
   /**
@@ -131,7 +135,7 @@ if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
   cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
 }
 $ = cheerio.load(res.data)
-console.log("get re", res.headers)
+// console.log("get re", res.headers)
 // -----------------------------以上ページ取得-----------------------------
 
 const form_build_id = $('[name="form_build_id"]').val()
@@ -201,21 +205,21 @@ bookData.forEach((elem)=>{
   }
 })
 
-console.log({
-  "active_page_top": 1,
-  "disp_count": 10,
-  "sort": "re.rtnlimdt-_-asc",
-  "target_key[]": target_key,
-  "active_page_bottom": 1,
-  'form_build_id': form_build_id,
-  'form_token': form_token,
-  "form_id": "ecats_ref_borrow_re",
-  "page": 1,
-  "op": "Go",
-  "target_key": target_key,
-  "act": "ext",
-})
-console.log("Cookie ", cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1])
+// console.log({
+//   "active_page_top": 1,
+//   "disp_count": 10,
+//   "sort": "re.rtnlimdt-_-asc",
+//   "target_key[]": target_key,
+//   "active_page_bottom": 1,
+//   'form_build_id': form_build_id,
+//   'form_token': form_token,
+//   "form_id": "ecats_ref_borrow_re",
+//   "page": 1,
+//   "op": "Go",
+//   "target_key": target_key,
+//   "act": "ext",
+// })
+// console.log("Cookie ", cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1])
 if (target_key){
   res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
                           new URLSearchParams({
