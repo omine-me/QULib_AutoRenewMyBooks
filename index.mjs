@@ -42,8 +42,8 @@ class CookieUtil {
 
 const isToday = (now ,inputDate) => {
   // console.log("isToday",now, now.getDate(),now.getDate()+1,now.getDate()+8)
-  return inputDate.getDate() == now.getDate() &&
-    inputDate.getMonth() == now.getMonth() &&
+  return inputDate.getDate() == 30 &&
+    inputDate.getMonth() == 8 &&
     inputDate.getFullYear() == now.getFullYear()
 }
 
@@ -138,8 +138,12 @@ $ = cheerio.load(res.data)
 // console.log("get re", res.headers)
 // -----------------------------以上ページ取得-----------------------------
 
-const form_build_id = $('[name="form_build_id"]').val()
-const form_token = $('[name="form_token"]').val()
+let form_build_id, form_token;
+$('form[class="form_ecats_ref_borrow"]').each((i, elem)=>{
+  console.log($('input[name="form_build_id"]', elem).val())
+  form_build_id = $('input[name="form_build_id"]', elem).val()
+  form_token = $('input[name="form_token"]', elem).val()
+})
 // タイトル、返却期限、延長可能か、target_keyを取得
 const bookData = []
 const numberRegex = /[^0-9]/g;
@@ -194,7 +198,7 @@ next_execute_date.setHours(23, 59);
 console.log("init next_execute_date", next_execute_date)
 bookData.forEach((elem)=>{
   if (elem.renewable){
-    if (!(isToday(nowTokyo, elem.returnDate))){ //今日を次回実行日にしない
+    if (elem.renewable&&isToday(nowTokyo, elem.returnDate)){ //今日を次回実行日にしない
       if (isWithinNDays(nowTokyo, elem.returnDate, 6)){
         if (elem.returnDate < next_execute_date){
           next_execute_date = elem.returnDate
@@ -237,8 +241,8 @@ if (target_key){
                             "act": "ext",
                           }),
                           // { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded', Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
-                          { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded', Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
-  console.log(res.headers)
+                          { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded', Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re", "Content-Length": data.toString().length, Origin: "https://www.lib.kyushu-u.ac.jp"} })
+  // console.log(res.headers)
   if (res.status == 302){
     // res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
     res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
