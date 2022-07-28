@@ -8,11 +8,11 @@ const client = axios.create({
   validateStatus: status => status < 500,
 });
 
-axios.interceptors.request.use(request => {
+client.interceptors.request.use(request => {
   console.log('Starting Request: ', request)
   return request
 })
-axios.interceptors.response.use(response => {
+client.interceptors.response.use(response => {
   console.log('Respose: ', response)
   return response
 })
@@ -85,7 +85,7 @@ const postform = new URLSearchParams({'csrf_token': token,
                                       'shib_idp_ls_supported': '',
                                       '_eventId_proceed': '',})
 // console.log(postform)
-res = await axios.post(redirectUrl,
+res = await client.post(redirectUrl,
                       postform,
                       { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]} }
                       )
@@ -231,16 +231,16 @@ if (target_key){
   // console.log(res.headers)
   if (res.status == 302){
     // res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
-    res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
+    res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re", Origin: "https://www.lib.kyushu-u.ac.jp"} })
     console.log(res.headers)
     //notification to Line
-    await client.post('https://notify-api.line.me/api/notify',
+    await axios.post('https://notify-api.line.me/api/notify',
     new URLSearchParams({
       'message': "以下の本を延長しました："+messege
     }),
     { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
   }else{
-    await client.post('https://notify-api.line.me/api/notify',
+    await axios.post('https://notify-api.line.me/api/notify',
     new URLSearchParams({
       'message': "以下の本の延長処理に失敗："+messege
     }),
@@ -316,7 +316,7 @@ const target = {
 
 //notification to Line about next exec
 next_execute_date.setDate(next_execute_date.getDate()+1)
-await client.post('https://notify-api.line.me/api/notify',
+await axios.post('https://notify-api.line.me/api/notify',
                   new URLSearchParams({
                     'message': "次回の実行日は"+(next_execute_date.getMonth()+1)+"/"+next_execute_date.getDate()+"です。"
                   }),
