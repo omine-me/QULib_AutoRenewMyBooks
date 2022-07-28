@@ -8,14 +8,14 @@ const client = axios.create({
   validateStatus: status => status < 500,
 });
 
-client.interceptors.request.use(request => {
-  console.log('Starting Request: ', request)
-  return request
-})
-client.interceptors.response.use(response => {
-  console.log('Respose: ', response)
-  return response
-})
+// client.interceptors.request.use(request => {
+//   console.log('Starting Request: ', request.url, request.headers)
+//   return request
+// })
+// client.interceptors.response.use(response => {
+//   console.log('Respose: ', response.headers)
+//   return response
+// })
 
 class CookieUtil {
   /**
@@ -42,8 +42,8 @@ class CookieUtil {
 
 const isToday = (now ,inputDate) => {
   // console.log("isToday",now, now.getDate(),now.getDate()+1,now.getDate()+8)
-  return inputDate.getDate() == 30 &&
-    inputDate.getMonth() == 8 &&
+  return inputDate.getDate() == now.getDate() &&
+    inputDate.getMonth() == now.getMonth() &&
     inputDate.getFullYear() == now.getFullYear()
 }
 
@@ -218,7 +218,7 @@ let data = new URLSearchParams({
   'form_token': form_token,
   "form_id": "ecats_ref_borrow_re",
   "page": 1,
-  "op": "Go",
+  // "op": "Go",
   "target_key": target_key,
   "act": "ext",
 })
@@ -232,7 +232,7 @@ if (target_key){
   if (res.status == 302){
     // res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
     res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re", Origin: "https://www.lib.kyushu-u.ac.jp"} })
-    console.log(res.headers)
+    // console.log(res.data)
     //notification to Line
     await axios.post('https://notify-api.line.me/api/notify',
     new URLSearchParams({
@@ -247,7 +247,6 @@ if (target_key){
     { headers: { 'Authorization': 'Bearer '+ process.env.LINE_TOKEN }})
   }
 }
-
 // GITHUB Actions Scheduleの更新
 next_execute_date.setDate(next_execute_date.getDate()-1)
 const octokit = new Octokit({ auth: process.env.GITTOHABU_TOKEN });
