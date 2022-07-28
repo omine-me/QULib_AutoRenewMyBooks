@@ -140,7 +140,6 @@ $ = cheerio.load(res.data)
 
 let form_build_id, form_token;
 $('form[class="form_ecats_ref_borrow"]').each((i, elem)=>{
-  console.log($('input[name="form_build_id"]', elem).val())
   form_build_id = $('input[name="form_build_id"]', elem).val()
   form_token = $('input[name="form_token"]', elem).val()
 })
