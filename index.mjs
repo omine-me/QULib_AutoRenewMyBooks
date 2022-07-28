@@ -8,14 +8,14 @@ const client = axios.create({
   validateStatus: status => status < 500,
 });
 
-// axios.interceptors.request.use(request => {
-//   console.log('Starting Request: ', request)
-//   return request
-// })
-// axios.interceptors.response.use(response => {
-//   console.log('Respose: ', response)
-//   return response
-// })
+axios.interceptors.request.use(request => {
+  console.log('Starting Request: ', request)
+  return request
+})
+axios.interceptors.response.use(response => {
+  console.log('Respose: ', response)
+  return response
+})
 
 class CookieUtil {
   /**
@@ -180,7 +180,7 @@ let messege = ""
 let target_key =""
 console.log("tokyoの現在時刻:", nowTokyo)
 bookData.forEach((elem)=>{
-  if (isToday(nowTokyo, elem.returnDate)){
+  if (elem.renewable&&isToday(nowTokyo, elem.returnDate)){
     if (target_key != "") {
       target_key += ",";
       messege+=", "
@@ -197,7 +197,7 @@ next_execute_date.setHours(23, 59);
 console.log("init next_execute_date", next_execute_date)
 bookData.forEach((elem)=>{
   if (elem.renewable){
-    if (elem.renewable&&isToday(nowTokyo, elem.returnDate)){ //今日を次回実行日にしない
+    if (isToday(nowTokyo, elem.returnDate)){ //今日を次回実行日にしない
       if (isWithinNDays(nowTokyo, elem.returnDate, 6)){
         if (elem.returnDate < next_execute_date){
           next_execute_date = elem.returnDate
