@@ -197,7 +197,7 @@ next_execute_date.setHours(23, 59);
 console.log("init next_execute_date", next_execute_date)
 bookData.forEach((elem)=>{
   if (elem.renewable){
-    if (isToday(nowTokyo, elem.returnDate)){ //今日を次回実行日にしない
+    if (!isToday(nowTokyo, elem.returnDate)){ //今日を次回実行日にしない
       if (isWithinNDays(nowTokyo, elem.returnDate, 6)){
         if (elem.returnDate < next_execute_date){
           next_execute_date = elem.returnDate
