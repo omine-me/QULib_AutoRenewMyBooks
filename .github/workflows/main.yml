@@ -3,7 +3,7 @@ name: QULib_AutoRenewMyBooks
 on:
   workflow_dispatch:
   schedule:
-    - cron: '10 15 6 12 *'
+    - cron: '10 15 12 12 *'
 jobs:
   QULib_AutoRenewMyBooks:
     runs-on: ubuntu-latest
