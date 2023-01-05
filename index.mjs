@@ -56,16 +56,14 @@ const isWithinNDays = (now, inputDate, withinDays=6) => {
 
 let redirectUrl = 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re'
 let res = await client.get(redirectUrl)
-let cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
+let SimpleSAMLSessionID = CookieUtil.getValue(res.headers['set-cookie'][0], 'SimpleSAMLSessionID')
 // console.log(cookie_SSESS)
 
-redirectUrl = 'https://www.lib.kyushu-u.ac.jp/Shibboleth.sso/Login?target=/ja/activities/usage_ref/re'
-res = await client.get(redirectUrl, { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1] } })
-// console.log(res.headers)
-let cookie_opensaml_req_ss = CookieUtil.getValue(res.headers['set-cookie'][0], 'opensaml')
+// ttps://idp.kyushu-u.ac.jp/idp/profile/SAML2/Redirect/SSO?SAMLRequest=hVJdj9MwEPwrkd8T54NwrdVWKlchKh1c1RQeeEFOvCUGxw7eNeX%2BPU4K4uChPK013pmdHe0K5WBGsQ3U2yN8C4CU%2FBiMRTF%2FrFnwVjiJGoWVA6CgTjTbtw%2BizHIxekeuc4Y9o9xmSETwpJ1lyX63Zp%2BKqmzPqlJ58WJZVKpYdHW1XJaxyrotyju1aCt4WbQgWfIBPEbmmkWhSEcMsLdI0lKE8rJK8yLN61NRi%2FpOVIuPLNnFbbSVNLN6ohEF51qN2dengH1IQya77Ms4QTzuctYG%2BGS15EdQ2kNHvGkeWbL97freWQwD%2BAb8d93B%2B%2BPDH93L5ZIZ3f6rjXoYDcxh9iMfnAoGsuk5QRyvtUxlhzOq4CyDoRRHlhx%2BxftKW6Xt59vJttcmFG9Op0N6eGxObLOatMWclN%2F8z2ev29YZoD7OXvHnzNX1Rt7FmfvdwRndPSWvnR8k3bY0IVql57lVkJcWNViKeRrjLvceJMGakQ%2FA%2BOY68u9L3PwE&RelayState=https%3A%2F%2Fwww.lib.kyushu-u.ac.jp%2Fja%2Factivities%2Fusage_ref%2Fre
 redirectUrl = res.headers['location']
-
 res = await client.get(redirectUrl)
+// console.log(res.headers)
+// let cookie_opensaml_req_ss = CookieUtil.getValue(res.headers['set-cookie'][0], 'opensaml')
 let cookie_JSESSIONID = CookieUtil.getValue(res.headers['set-cookie'][0], 'JSESSIONID')
 redirectUrl = res.headers['location']
 redirectUrl = 'https://idp.kyushu-u.ac.jp'+redirectUrl
