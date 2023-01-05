@@ -54,20 +54,20 @@ const isWithinNDays = (now, inputDate, withinDays=6) => {
   return inputDate < nDaysLater
 }
 
+//// /re
 let redirectUrl = 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re'
 let res = await client.get(redirectUrl)
 let SimpleSAMLSessionID = CookieUtil.getValue(res.headers['set-cookie'][0], 'SimpleSAMLSessionID')
+redirectUrl = res.headers['location']
 // console.log(cookie_SSESS)
 
-// ttps://idp.kyushu-u.ac.jp/idp/profile/SAML2/Redirect/SSO?SAMLRequest=hVJdj9MwEPwrkd8T54NwrdVWKlchKh1c1RQeeEFOvCUGxw7eNeX%2BPU4K4uChPK013pmdHe0K5WBGsQ3U2yN8C4CU%2FBiMRTF%2FrFnwVjiJGoWVA6CgTjTbtw%2BizHIxekeuc4Y9o9xmSETwpJ1lyX63Zp%2BKqmzPqlJ58WJZVKpYdHW1XJaxyrotyju1aCt4WbQgWfIBPEbmmkWhSEcMsLdI0lKE8rJK8yLN61NRi%2FpOVIuPLNnFbbSVNLN6ohEF51qN2dengH1IQya77Ms4QTzuctYG%2BGS15EdQ2kNHvGkeWbL97freWQwD%2BAb8d93B%2B%2BPDH93L5ZIZ3f6rjXoYDcxh9iMfnAoGsuk5QRyvtUxlhzOq4CyDoRRHlhx%2BxftKW6Xt59vJttcmFG9Op0N6eGxObLOatMWclN%2F8z2ev29YZoD7OXvHnzNX1Rt7FmfvdwRndPSWvnR8k3bY0IVql57lVkJcWNViKeRrjLvceJMGakQ%2FA%2BOY68u9L3PwE&RelayState=https%3A%2F%2Fwww.lib.kyushu-u.ac.jp%2Fja%2Factivities%2Fusage_ref%2Fre
-redirectUrl = res.headers['location']
+//// https://idp.kyushu-u.ac.jp/idp/profile/SAML2/Redirect/SSO?SAMLRequest=hVJdj9MwEPwrkd8T54NwrdVWKlchKh1c1RQeeEFOvCUGxw7eNeX%2BPU4K4uChPK013pmdHe0K5WBGsQ3U2yN8C4CU%2FBiMRTF%2FrFnwVjiJGoWVA6CgTjTbtw%2BizHIxekeuc4Y9o9xmSETwpJ1lyX63Zp%2BKqmzPqlJ58WJZVKpYdHW1XJaxyrotyju1aCt4WbQgWfIBPEbmmkWhSEcMsLdI0lKE8rJK8yLN61NRi%2FpOVIuPLNnFbbSVNLN6ohEF51qN2dengH1IQya77Ms4QTzuctYG%2BGS15EdQ2kNHvGkeWbL97freWQwD%2BAb8d93B%2B%2BPDH93L5ZIZ3f6rjXoYDcxh9iMfnAoGsuk5QRyvtUxlhzOq4CyDoRRHlhx%2BxftKW6Xt59vJttcmFG9Op0N6eGxObLOatMWclN%2F8z2ev29YZoD7OXvHnzNX1Rt7FmfvdwRndPSWvnR8k3bY0IVql57lVkJcWNViKeRrjLvceJMGakQ%2FA%2BOY68u9L3PwE&RelayState=https%3A%2F%2Fwww.lib.kyushu-u.ac.jp%2Fja%2Factivities%2Fusage_ref%2Fre
 res = await client.get(redirectUrl)
-// console.log(res.headers)
-// let cookie_opensaml_req_ss = CookieUtil.getValue(res.headers['set-cookie'][0], 'opensaml')
 let cookie_JSESSIONID = CookieUtil.getValue(res.headers['set-cookie'][0], 'JSESSIONID')
 redirectUrl = res.headers['location']
 redirectUrl = 'https://idp.kyushu-u.ac.jp'+redirectUrl
 
+//// GET /?e1s1
 res = await client.get(redirectUrl, { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]} })
 let $ = cheerio.load(res.data)
 let token = $('[name="csrf_token"]').val()
@@ -83,6 +83,7 @@ const postform = new URLSearchParams({'csrf_token': token,
                                       'shib_idp_ls_supported': '',
                                       '_eventId_proceed': '',})
 // console.log(postform)
+//// POST /?e1s1
 res = await client.post(redirectUrl,
                       postform,
                       { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]} }
@@ -94,12 +95,14 @@ redirectUrl = "https://idp.kyushu-u.ac.jp/idp/profile/SAML2/Redirect/SSO?executi
 // console.log('110',res.headers)
 // console.log('110',res.data)
 
+//// GET /?e1s2
 res = await client.get(redirectUrl, { headers: { Cookie: 'JSESSIONID=' + cookie_JSESSIONID[1]} })
 $ = cheerio.load(res.data)
 token = $('[name="csrf_token"]').val()
 // console.log('116 data', res.data)
 // console.log('116 csrf_token', token)
 
+//// POST /?e1s2
 res = await client.post(redirectUrl,
   new URLSearchParams({
     'csrf_token': token,
@@ -111,24 +114,34 @@ res = await client.post(redirectUrl,
 $ = cheerio.load(res.data)
 const RelayState = $('[name="RelayState"]').val()
 const SAMLResponse = $('[name="SAMLResponse"]').val()
+let shib_idp_session = CookieUtil.getValue(res.headers['set-cookie'][0], 'shib_idp_session')
 // console.log(res.data)
 // console.log(SAMLResponse)
 
-res = await client.post('https://www.lib.kyushu-u.ac.jp/Shibboleth.sso/SAML2/POST',
+// POST default-sp
+res = await client.post('https://www.lib.kyushu-u.ac.jp/simplesamlphp/module.php/saml/sp/saml2-acs.php/default-sp',
                         new URLSearchParams({
                           'RelayState': RelayState,
                           'SAMLResponse': SAMLResponse
                         }),
-                        { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
+                        { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1], 'Content-Type': 'application/x-www-form-urlencoded'} })
 let allCookie = res.headers['set-cookie'].toString()
 const replaceWord = /,/g
 allCookie = allCookie.replace(replaceWord, '; '); //getAllHeadersの場合
-let cookie_shibsession = CookieUtil.getValue(allCookie, 'shibsession')
+let SimpleSAMLAuthToken = CookieUtil.getValue(allCookie, 'SimpleSAMLAuthToken')
 if (CookieUtil.getValue(allCookie, 'opensaml')){
   cookie_opensaml_req_ss = CookieUtil.getValue(allCookie, 'opensaml')
 }
 
-res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]} })
+// GET re
+res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]} })
+if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
+  let cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
+}
+redirectUrl = res.headers['location']
+
+// GET re?check_logged_in=1
+res = await client.get(redirectUrl, { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1]} })
 if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
   cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
 }
