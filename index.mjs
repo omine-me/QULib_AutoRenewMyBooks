@@ -57,6 +57,7 @@ const isWithinNDays = (now, inputDate, withinDays=6) => {
 //// /re
 let redirectUrl = 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re'
 let res = await client.get(redirectUrl)
+console.log(res.headers)
 let SimpleSAMLSessionID = CookieUtil.getValue(res.headers['set-cookie'][0], 'SimpleSAMLSessionID')
 redirectUrl = res.headers['location']
 // console.log(cookie_SSESS)
