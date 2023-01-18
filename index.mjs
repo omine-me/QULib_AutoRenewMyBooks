@@ -146,11 +146,11 @@ if (CookieUtil.getValue(allCookie, 'opensaml')){
   cookie_opensaml_req_ss = CookieUtil.getValue(allCookie, 'opensaml')
 }
 
-// GET re
-res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]} })
-if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
-  let cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
-}
+// // GET re
+// res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re?check_logged_in=1', { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]} })
+// if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
+//   let cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
+// }
 redirectUrl = res.headers['location']
 
 // GET re?check_logged_in=1
@@ -164,6 +164,7 @@ if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
 }
 
 if (res.headers['location']){
+  redirectUrl = res.headers['location']
   // GET re?check_logged_in=1
   if (cookie_SSESS){
     res = await client.get(redirectUrl, { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1]} })
