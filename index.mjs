@@ -58,8 +58,14 @@ const isWithinNDays = (now, inputDate, withinDays=6) => {
 let redirectUrl = 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re?check_logged_in=1'
 let res = await client.get(redirectUrl)
 console.log(res.headers)
-let SimpleSAMLSessionID = CookieUtil.getValue(res.headers['set-cookie'][0], 'SimpleSAMLSessionID')
-redirectUrl = res.headers['location']
+if (res.headers['set-cookie']){
+  let SimpleSAMLSessionID = CookieUtil.getValue(res.headers['set-cookie'][0], 'SimpleSAMLSessionID')
+  redirectUrl = res.headers['location']
+}else{
+  $ = cheerio.load(res.data)
+  redirectUrl = $().find('a').attr('href');
+}
+
 // console.log(cookie_SSESS)
 
 //// https://idp.kyushu-u.ac.jp/idp/profile/SAML2/Redirect/SSO?SAMLRequest=hVJdj9MwEPwrkd8T54NwrdVWKlchKh1c1RQeeEFOvCUGxw7eNeX%2BPU4K4uChPK013pmdHe0K5WBGsQ3U2yN8C4CU%2FBiMRTF%2FrFnwVjiJGoWVA6CgTjTbtw%2BizHIxekeuc4Y9o9xmSETwpJ1lyX63Zp%2BKqmzPqlJ58WJZVKpYdHW1XJaxyrotyju1aCt4WbQgWfIBPEbmmkWhSEcMsLdI0lKE8rJK8yLN61NRi%2FpOVIuPLNnFbbSVNLN6ohEF51qN2dengH1IQya77Ms4QTzuctYG%2BGS15EdQ2kNHvGkeWbL97freWQwD%2BAb8d93B%2B%2BPDH93L5ZIZ3f6rjXoYDcxh9iMfnAoGsuk5QRyvtUxlhzOq4CyDoRRHlhx%2BxftKW6Xt59vJttcmFG9Op0N6eGxObLOatMWclN%2F8z2ev29YZoD7OXvHnzNX1Rt7FmfvdwRndPSWvnR8k3bY0IVql57lVkJcWNViKeRrjLvceJMGakQ%2FA%2BOY68u9L3PwE&RelayState=https%3A%2F%2Fwww.lib.kyushu-u.ac.jp%2Fja%2Factivities%2Fusage_ref%2Fre
@@ -170,7 +176,7 @@ $ = cheerio.load(res.data)
 
 let form_build_id, form_token;
 $('form[class="form_ecats_ref_borrow"]').each((i, elem)=>{
-  form_build_id = $('input[name="form_build_id"]', elem).val()
+  form_build_id = $('input[name="target_key[]"]', elem).val()
   form_token = $('input[name="form_token"]', elem).val()
 })
 // タイトル、返却期限、延長可能か、target_keyを取得
