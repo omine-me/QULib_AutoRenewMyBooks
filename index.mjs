@@ -142,10 +142,28 @@ if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
 redirectUrl = res.headers['location']
 
 // GET re?check_logged_in=1
-res = await client.get(redirectUrl, { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1]} })
+if (cookie_SSESS){
+  res = await client.get(redirectUrl, { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1]} })
+}else{
+  res = await client.get(redirectUrl, { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]} })
+}
 if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
   cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
 }
+
+if (res.headers['location']){
+  // GET re?check_logged_in=1
+  if (cookie_SSESS){
+    res = await client.get(redirectUrl, { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1]} })
+  }else{
+    res = await client.get(redirectUrl, { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]} })
+  }
+  if (CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')){
+    cookie_SSESS = CookieUtil.getValue(res.headers['set-cookie'][0], 'SSESS')
+  }
+}
+
+
 $ = cheerio.load(res.data)
 // console.log("get re", res.headers)
 // -----------------------------以上ページ取得-----------------------------
