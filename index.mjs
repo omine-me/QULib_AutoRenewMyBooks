@@ -59,6 +59,7 @@ let redirectUrl = 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re?che
 let res = await client.get(redirectUrl)
 console.log(res.headers)
 let SimpleSAMLSessionID
+let cookie_SSESS
 if (res.headers['set-cookie']){
   SimpleSAMLSessionID = CookieUtil.getValue(res.headers['set-cookie'][0], 'SimpleSAMLSessionID')
   redirectUrl = res.headers['location']
