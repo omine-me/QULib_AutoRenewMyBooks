@@ -58,8 +58,9 @@ const isWithinNDays = (now, inputDate, withinDays=6) => {
 let redirectUrl = 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re?check_logged_in=1'
 let res = await client.get(redirectUrl)
 console.log(res.headers)
+let SimpleSAMLSessionID
 if (res.headers['set-cookie']){
-  let SimpleSAMLSessionID = CookieUtil.getValue(res.headers['set-cookie'][0], 'SimpleSAMLSessionID')
+  SimpleSAMLSessionID = CookieUtil.getValue(res.headers['set-cookie'][0], 'SimpleSAMLSessionID')
   redirectUrl = res.headers['location']
 }else{
   $ = cheerio.load(res.data)
