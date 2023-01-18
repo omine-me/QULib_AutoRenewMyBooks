@@ -137,6 +137,9 @@ res = await client.post('https://www.lib.kyushu-u.ac.jp/simplesamlphp/module.php
 let allCookie = res.headers['set-cookie'].toString()
 const replaceWord = /,/g
 allCookie = allCookie.replace(replaceWord, '; '); //getAllHeadersの場合
+if (CookieUtil.getValue(allCookie, 'SimpleSAMLSessionID')){
+  SimpleSAMLSessionID = CookieUtil.getValue(allCookie, 'SimpleSAMLSessionID')
+}
 let SimpleSAMLAuthToken = CookieUtil.getValue(allCookie, 'SimpleSAMLAuthToken')
 if (CookieUtil.getValue(allCookie, 'opensaml')){
   cookie_opensaml_req_ss = CookieUtil.getValue(allCookie, 'opensaml')
