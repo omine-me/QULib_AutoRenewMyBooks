@@ -132,7 +132,7 @@ res = await client.post('https://www.lib.kyushu-u.ac.jp/simplesamlphp/module.php
                           'SAMLResponse': SAMLResponse
                         }),
                         { headers: { 
-                          Cookie: (typeof SimpleSAMLSessionID ? SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1] : ""), 
+                          Cookie: (typeof SimpleSAMLSessionID !== 'undefined' ? SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1] : ""), 
                           'Content-Type': 'application/x-www-form-urlencoded'} })
 let allCookie = res.headers['set-cookie'].toString()
 const replaceWord = /,/g
