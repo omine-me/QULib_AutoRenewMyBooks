@@ -252,30 +252,37 @@ bookData.forEach((elem)=>{
   }
 })
 
-let data = new URLSearchParams({
-  "active_page_top": 1,
-  "disp_count": 10,
-  "sort": "re.rtnlimdt-_-asc",
-  "target_key[]": target_key,
-  "active_page_bottom": 1,
-  'form_build_id': form_build_id,
-  'form_token': form_token,
-  "form_id": "ecats_ref_borrow_re",
-  "page": 1,
-  // "op": "Go",
-  "target_key": target_key,
-  "act": "ext",
-})
-// console.log("Cookie ", cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1]+'; '+cookie_SSESS[0]+'='+cookie_SSESS[1])
+// let data = new URLSearchParams({
+//   "active_page_top": 1,
+//   "disp_count": 10,
+//   "sort": "re.rtnlimdt-_-asc",
+//   "target_key[]": target_key,
+//   "active_page_bottom": 1,
+//   'form_build_id': form_build_id,
+//   'form_token': form_token,
+//   "form_id": "ecats_ref_borrow_re",
+//   "page": 1,
+//   // "op": "Go",
+//   "target_key": target_key,
+//   "act": "ext",
+// })
 if (target_key){
-  res = await client.post('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re',
-                          data,
-                          // { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded', Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
-                          { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], 'Content-Type': 'application/x-www-form-urlencoded', Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re", "Content-Length": data.toString().length, Origin: "https://www.lib.kyushu-u.ac.jp"} })
+  res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re/renew?status=&sort=due-asc&disp_count=10&' + 
+                          'target_key%5B%5D='+target_key+
+                          '&target_key='+target_key
+                          ,
+                          { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+
+                                              SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]+'; '+
+                                              cookie_SSESS[0]+'='+cookie_SSESS[1]
+                                              , 
+                                        Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re", Origin: "https://www.lib.kyushu-u.ac.jp"} })
   // console.log(res.headers)
   if (res.status == 302){
-    // res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_opensaml_req_ss[0] +'=' + cookie_opensaml_req_ss[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re"} })
-    res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: cookie_SSESS[0]+'='+cookie_SSESS[1]+'; '+cookie_shibsession[0]+'='+cookie_shibsession[1], Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re", Origin: "https://www.lib.kyushu-u.ac.jp"} })
+    res = await client.get('https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re', { headers: { Cookie: SimpleSAMLSessionID[0]+'='+SimpleSAMLSessionID[1]+'; '+
+                                                                                                              SimpleSAMLAuthToken[0]+'='+SimpleSAMLAuthToken[1]+'; '+
+                                                                                                              cookie_SSESS[0]+'='+cookie_SSESS[1], 
+                                                                                                    Referer: "https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re",
+                                                                                                    Origin: "https://www.lib.kyushu-u.ac.jp"} })
     // console.log(res.data)
     //notification to Line
     await axios.post('https://notify-api.line.me/api/notify',
