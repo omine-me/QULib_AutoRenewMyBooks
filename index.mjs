@@ -189,8 +189,7 @@ $('form[class="form_ecats_ref_borrow"]').each((i, elem)=>{
 })
 // タイトル、返却期限、延長可能か、target_keyを取得
 const bookData = []
-const numberRegex = /[^0-9]/g;
-$('ul[class="line_block clearfix"]').each((i, elem) => {
+$('li[class="item list-group-item"]').each((i, elem) => {
   // console.log("inside: ",$(elem).text())
   let returnDate;
   let title = $("h4", elem).text()
@@ -198,20 +197,16 @@ $('ul[class="line_block clearfix"]').each((i, elem) => {
   let target_key;
   $('span', elem).each((i, span) => {
     let span_txt = $(span).text()
-    if (span_txt.match(/返却期限 2/)){
-      returnDate = new Date(span_txt.slice(span_txt.indexOf("2")).replace(/\./g, '-')) //"返却期限 2022.08.01"　などから2以降の文字列を取り出し、.を-に置き換え、日付に変換
-      // validSpanCount++;
+    if (span_txt.match(/返却期限\d+/)){
+      returnDate = new Date(span_txt.slice(span_txt.indexOf(2)).replace(/\./g, '-')) //"返却期限 2022.08.01"　などから2以降の文字列を取り出し、.を-に置き換え、日付に変換
     }
   })
-  $('li[class="line btn"]', elem).each((i, li) => {
+  $('input[class="btn-renew button js-form-submit form-submit form-control"]', elem).each((i, input) => {
     // renewable = li.find("input")
-    // console.log($(li).first())
-    $("input", li).each((i, input) => {
-      if ($(input).attr("value") == "貸出更新"){
+      if ($(input).attr("value") === "貸出更新"){
         renewable = true;
-        target_key = $(input).attr("onclick").replace(numberRegex, "")
+        target_key = $(input).attr("data-bookid")
       }
-    })
   })
   bookData.push({"title": title, "returnDate": returnDate, "renewable": renewable, "target_key": target_key})
   // console.log(title, renewable, returnDate, target_key)
