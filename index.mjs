@@ -57,7 +57,7 @@ const isWithinNDays = (now, inputDate, withinDays=6) => {
 //// /re
 let redirectUrl = 'https://www.lib.kyushu-u.ac.jp/ja/activities/usage_ref/re?check_logged_in=1'
 let res = await client.get(redirectUrl)
-console.log(res.headers)
+// console.log(res.headers)
 let SimpleSAMLSessionID
 let cookie_SSESS
 if (res.headers['set-cookie']){
@@ -212,7 +212,7 @@ $('li[class="item list-group-item"]').each((i, elem) => {
   // console.log(title, renewable, returnDate, target_key)
 })
 
-// console.log(bookData)
+console.log(bookData)
 const nowUTC = new Date();
 const nowTokyo = new Date(nowUTC.setHours(nowUTC.getHours()+9))
 let messege = ""
